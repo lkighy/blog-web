@@ -203,6 +203,7 @@ export default {
     text-align: center;
     line-height: 56px;
     display: none;
+    background-color: #fff;
   }
 
   header i {
