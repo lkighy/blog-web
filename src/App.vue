@@ -61,7 +61,7 @@
               </router-link>
           </li>
           <li>
-              <router-link to="/class">
+              <router-link to="/categories">
                   <i class="icon-class"></i>
                   <span>分类</span>
               </router-link>

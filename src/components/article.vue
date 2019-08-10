@@ -90,7 +90,7 @@
 import '../lib/css/github-markdown.css'
 export default {
     name: 'articleTemp',
-    props: ['id'],
+    props: ['title'],
     data() {
         return {
         }
