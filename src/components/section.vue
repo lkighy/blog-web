@@ -4,7 +4,7 @@
         <div class="postShorten-wrap">
             <div class="postShorten-header">
                 <router-link tag='h1' :to="'article/'+post.id">
-                    {{ post.title }}
+                    {{ post.name }}
                 </router-link>
                 <div class="postShorten-meta">
                     <time>{{ post.updatedAt }}</time>
@@ -41,17 +41,24 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
     name: 'sectionTemp',
     data() {
         return {
             posts: [
-                { id: 1,title: "Rust 🦀 和 WebAssembly 🕸", updatedAt: "2018-05-01",  category: "rust", read: 1123, excerpt: "这本书描述了 rust 和 WebAssembly 的使用。", thumbnailimg: ''},
-                { id: 2,title: "这是一个实验性标题", updatedAt: "2018-03-01",  category: "教程", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
-                { id: 3,title: "这是测试标题的文章", updatedAt: "2018-09-01",  category: "其他", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
-                { id: 4,title: "这是一个测试标题", updatedAt: "2018-08-01",  category: "ssr", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
-                { id: 6,title: "这是一个标题--------", updatedAt: "2019-05-01",  category: "rss", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
+                { id: 1,name: "Rust 🦀 和 WebAssembly 🕸", updatedAt: "2018-05-01",  category: "rust", read: 1123, excerpt: "这本书描述了 rust 和 WebAssembly 的使用。", thumbnailimg: ''},
+                { id: 2,name: "这是一个实验性标题", updatedAt: "2018-03-01",  category: "教程", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
+                { id: 3,name: "这是测试标题的文章", updatedAt: "2018-09-01",  category: "其他", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
+                { id: 4,name: "这是一个测试标题", updatedAt: "2018-08-01",  category: "ssr", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
+                { id: 6,name: "这是一个标题--------", updatedAt: "2019-05-01",  category: "rss", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
             ]
+        }
+    },
+    methods: {
+        getIndex() {
+            
         }
     }
 }
