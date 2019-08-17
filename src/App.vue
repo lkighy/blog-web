@@ -106,12 +106,9 @@
 </template>
 
 <script>
-import router from './router'
-import './lib/css/animate.css'
 
 export default {
   name: 'app',
-  router,
   data() {
     return {
       windowHeight: 0,
@@ -123,6 +120,15 @@ export default {
     }
   },
   methods: {
+    getInfo() {
+      this.axios.get(this.$store.state.infoURL)
+        .then( res => {
+            this.info = res.data.blog
+        })
+        .catch( err => {
+            this.info = err.response.status
+        })
+    },
     handleResize() {
       this.windowHeight = window.innerWidth;
     },
@@ -153,6 +159,12 @@ export default {
 </script>
 
 <style>
+  .absolute {
+        position: absolute;
+    }
+  .move {
+      transition: all 1s;
+  }
   .close_search {
     position: absolute;
     right: 12px;

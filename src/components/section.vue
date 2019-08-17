@@ -1,16 +1,23 @@
 <template>
 <section>
-    <article v-for="post in posts" :key="post.id">
+    <!-- <transition-group
+    move-class="move"
+    mode="out-in"
+    enter-active-class="animated slideInUp"
+    leave-active-class="animated slideOutUp"
+    :duration="{ enter: 1000, leave: 1000 }"
+    > -->
+    <article v-for="post in excerpts" :key="post.id">
         <div class="postShorten-wrap">
             <div class="postShorten-header">
                 <router-link tag='h1' :to="'article/'+post.id">
                     {{ post.name }}
                 </router-link>
                 <div class="postShorten-meta">
+                    <span>发表于</span>
+                    <time>{{ post.createdAt }}</time>
+                    <span>更新于</span>
                     <time>{{ post.updatedAt }}</time>
-                    <span> in </span>
-                    <a href="">{{ post.category }}</a>
-                    <span> read({{ post.read }})</span>
                 </div>
             </div>
             <div class="postShorten-excerpt">
@@ -22,49 +29,163 @@
         </div>
         <div class="clear"></div>
     </article>
+    <!-- </transition-group> -->
+
+
     <div class="page">
         <ul>
             <li class="page-prev left">
-                <router-link to="/">
+                <router-link :to="`/?page=`+ (pages.current - 1)" :class="{'click-ban': page <= '1'}">
                     上一页
                 </router-link>
             </li>
             <li class="page-next left">
-                <router-link to="/">
+                <router-link :to="'/?page='+ (pages.current + 1)" :class="{'click-ban': page >= pages.sum}">
                     下一页
                 </router-link>
             </li>
-            <li class="right">第 1 页 / 共 1 页</li>
+            <li class="right">第 {{ pages.current }} 页 / 共 {{ pages.sum }} 页</li>
         </ul>
     </div>
 </section>
 </template>
 
 <script>
-import axios from 'axios'
+import { get } from 'http';
 
 export default {
     name: 'sectionTemp',
     data() {
         return {
-            posts: [
-                { id: 1,name: "Rust 🦀 和 WebAssembly 🕸", updatedAt: "2018-05-01",  category: "rust", read: 1123, excerpt: "这本书描述了 rust 和 WebAssembly 的使用。", thumbnailimg: ''},
-                { id: 2,name: "这是一个实验性标题", updatedAt: "2018-03-01",  category: "教程", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
-                { id: 3,name: "这是测试标题的文章", updatedAt: "2018-09-01",  category: "其他", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
-                { id: 4,name: "这是一个测试标题", updatedAt: "2018-08-01",  category: "ssr", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
-                { id: 6,name: "这是一个标题--------", updatedAt: "2019-05-01",  category: "rss", read: 1123, excerpt: "这是文章内容的摘录，就是这么简单...", thumbnailimg: ''},
-            ]
+            spare: true,
+            status: 200,
+            index: [],
+            excerpts: [],
+            posts: [],
+            info: [],
+            page: 1,
+            pages: {
+                current: 1,
+                sum: 1
+            }
         }
     },
     methods: {
-        getIndex() {
-            
+        // 请求首页信息
+        async getHome() {
+            let url = ""
+            if (this.spare) {
+                url = this.$store.state.indexURL+this.page+'.json'
+            } else {
+                url = this.$store.state.indexURL+this.page+'_copy.json'
+            }
+            await this.axios.get(url)
+            .then( res => {
+                this.pages = res.data.pages
+                this.posts = res.data.index
+            })
+            .catch( err => {
+                if (this.spare) {
+                    this.spare = false
+                    this.getHome()
+                } else {
+                    this.status = err.response.status
+                    // 让页面变成 404 
+                    // console.log("404")
+                }
+            })
+        },
+        async getIndex() {
+            // 获取 index.json 文件, 副本是 index_copy.json
+            let url = ""
+            if (this.spare) {
+                url = this.$store.state.indexURL + "index.json"
+            } else {
+                url = this.$store.state.indexURL + "index_copy.json"
+            }
+            await this.axios.get(url)
+            .then( res => {
+                // console.log("index: ",res.data.index)
+                this.index = res.data.index
+            })
+            .catch( err => {
+                if (this.spare) {
+                    this.spare = false
+                    this.getIndex()
+                } else {
+                    this.status = err.response.status
+                }
+            })
+        },
+        rmExcerpt() {
+            // 循环移除 excerpts
+            while (this.excerpts.length != 0) {
+                this.excerpts.shift()
+            }
+        },
+        async getExcerpt() {
+            // 获取页码
+            let num = this.index.length
+            let sum = this.pages.sum
+            let current = this.pages.current
+            // 获取切片
+            let idx = this.index.slice((current-1)*10, current < sum ? (current-1)*10+10:num)
+            let url = this.$store.state.excerpt
+            for (let i = 0; i < idx.length; i++ ) {
+                let id = idx[i]
+                await this.axios.get(url+id+'.json')
+                .then( res => {{
+                    this.excerpts.push(res.data.excerpt)
+                }})
+                .catch( err => {
+                    console.log("文章id: ", id, "不存在")
+                })
+            }
+        },
+        getPage() {
+            // 获取当前页码
+            let page = this.$route.query.page
+            if (typeof(page) == "undefined") {
+                this.page = "1"
+            } else {
+                this.page = page
+            }
+            // 获取页码数
+            let num = this.index.length
+            this.pages.sum = Math.ceil(num / this.$store.state.indexRow)
+            this.pages.current = parseInt(this.page)
         }
+    },
+    watch: {
+        '$route.query.page': function() {
+            this.getPage()
+            this.rmExcerpt()
+            this.getExcerpt()
+        }
+    },
+    mounted() {
+        // this.getPage();
+        // this.getHome();
+        // this.getIndex();
+        // this.getExcerpt();
+        (async () => {
+            this.getPage();
+            await this.getHome();
+            await this.getIndex();
+            await this.getExcerpt();
+        })()
+        // this.getExcerpt();
     }
 }
 </script>
 
 <style scoped>
+    .page .click-ban {
+        cursor: not-allowed;
+        pointer-events:none;
+        color: #eee;
+        border: 1px solid #eee;
+    }
     a {
         text-decoration: none;
     }

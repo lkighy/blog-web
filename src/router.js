@@ -8,14 +8,14 @@ Vue.use(VueRouter)
 
  var router = new VueRouter ({
   routes: [{
-      path: '/',
-      component: sectionTemp,
-    },{
-      path: '/article/:title',
+      path: '/article/:id',
       component: articleTemp
     },{
       path: '/categories',
       component: categoriesTemp
+    },{
+      path: '/',
+      component: sectionTemp,
     }]
 })
 
