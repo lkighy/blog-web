@@ -14,10 +14,11 @@
         <div class="post-footer">
             <div class="post-footer-tags">
                 <span>文章分类:</span>
-                <span class="right">最后编辑于 2019/01/18</span>
+                <span class="right">最后编辑于 {{ info.updatedAt }}</span>
                 <div class="tag">
-                    <a href="">rust</a>
-                    <a href="">WebAssembly</a>
+                    <router-link :to="'/search/tag/'+tag" v-for="(tag, i) in info.tags" :key="i">
+                        {{ tag }}
+                    </router-link>
                 </div>
             </div>
             <div class="post-actions-wrap">
@@ -37,11 +38,21 @@ export default {
         return {
             articleId: "",
             article: "",
+            info: {},
         }
     },
     methods: {
         getArticleId() {
             this.articleId = this.$route.params.id
+        },
+        getExcerpt() {
+            this.axios.get(this.$store.state.excerptURL+this.articleId+".json")
+            .then(res => {
+                this.info = res.data.excerpt
+            })
+            .catch(err => {
+                // 
+            })
         },
         getArticle() {
             this.axios.get(this.$store.state.htmlBookURL+this.articleId+".html")
@@ -49,7 +60,7 @@ export default {
                     this.article = res.data
                 })
                 .catch(err => {
-                    this.article = err.response
+                    // this.article = err.response.status
                 })
         },
         getArticlePrev() {
@@ -62,6 +73,7 @@ export default {
     mounted() {
         this.getArticleId()
         this.getArticle()
+        this.getExcerpt()
     },
 }
 </script>

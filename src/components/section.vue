@@ -14,10 +14,10 @@
                     {{ post.name }}
                 </router-link>
                 <div class="postShorten-meta">
-                    <span>发表于</span>
-                    <time>{{ post.createdAt }}</time>
-                    <span>更新于</span>
-                    <time>{{ post.updatedAt }}</time>
+                    <span>发表于 </span>
+                    <span>{{ post.createdAt }}</span>
+                    <span> 更新于 </span>
+                    <span>{{ post.updatedAt }}</span>
                 </div>
             </div>
             <div class="postShorten-excerpt">
@@ -72,29 +72,29 @@ export default {
     },
     methods: {
         // 请求首页信息
-        async getHome() {
-            let url = ""
-            if (this.spare) {
-                url = this.$store.state.indexURL+this.page+'.json'
-            } else {
-                url = this.$store.state.indexURL+this.page+'_copy.json'
-            }
-            await this.axios.get(url)
-            .then( res => {
-                this.pages = res.data.pages
-                this.posts = res.data.index
-            })
-            .catch( err => {
-                if (this.spare) {
-                    this.spare = false
-                    this.getHome()
-                } else {
-                    this.status = err.response.status
-                    // 让页面变成 404 
-                    // console.log("404")
-                }
-            })
-        },
+        // async getHome() {
+        //     let url = ""
+        //     if (this.spare) {
+        //         url = this.$store.state.indexURL+this.page+'.json'
+        //     } else {
+        //         url = this.$store.state.indexURL+this.page+'_copy.json'
+        //     }
+        //     await this.axios.get(url)
+        //     .then( res => {
+        //         this.pages = res.data.pages
+        //         this.posts = res.data.index
+        //     })
+        //     .catch( err => {
+        //         if (this.spare) {
+        //             this.spare = false
+        //             this.getHome()
+        //         } else {
+        //             this.status = err.response.status
+        //             // 让页面变成 404 
+        //             // console.log("404")
+        //         }
+        //     })
+        // },
         async getIndex() {
             // 获取 index.json 文件, 副本是 index_copy.json
             let url = ""
@@ -130,7 +130,7 @@ export default {
             let current = this.pages.current
             // 获取切片
             let idx = this.index.slice((current-1)*10, current < sum ? (current-1)*10+10:num)
-            let url = this.$store.state.excerpt
+            let url = this.$store.state.excerptURL
             for (let i = 0; i < idx.length; i++ ) {
                 let id = idx[i]
                 await this.axios.get(url+id+'.json')
@@ -138,7 +138,9 @@ export default {
                     this.excerpts.push(res.data.excerpt)
                 }})
                 .catch( err => {
-                    console.log("文章id: ", id, "不存在")
+                    // console.log("文章id: ", id, "不存在")
+                    // this.status = err.response.status
+                    // 还需要再想一想
                 })
             }
         },
@@ -169,9 +171,8 @@ export default {
         // this.getIndex();
         // this.getExcerpt();
         (async () => {
-            this.getPage();
-            await this.getHome();
             await this.getIndex();
+            this.getPage();
             await this.getExcerpt();
         })()
         // this.getExcerpt();

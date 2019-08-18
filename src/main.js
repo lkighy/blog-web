@@ -16,16 +16,21 @@ Vue.use(Vuex)
 
 var store = new Vuex.Store({
   state: {
+    // 一页显示多少篇文章
     indexRow: 10,
+    // 请求地址
     indexURL: "/book/index/",
     htmlBookURL: "/book/htmlbook/",
     mdBookURL: "/book/mdbook/",
-    excerpt: "/book/excerpt/",
+    excerptURL: "/book/excerpt/",
     tagIndexURL: "/book/index/tags_index.json",
     categoriesIndexURL: "/book/index/categories_index.json",
     tagsURL: "/book/tags.json",
     categoriesURL: "/book/categories.json",
-    infoURL: "/book/info.json"
+    infoURL: "/book/info.json",
+    // 存储内容
+    // 当前在看文章
+    // 首页内容
   },
   mutations: {}
 })
