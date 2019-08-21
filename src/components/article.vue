@@ -16,7 +16,7 @@
                 <span>文章分类:</span>
                 <span class="right">最后编辑于 {{ info.updatedAt }}</span>
                 <div class="tag">
-                    <router-link :to="'/search/tag/'+tag" v-for="(tag, i) in info.tags" :key="i">
+                    <router-link :to="'/search/?tag='+tag" v-for="(tag, i) in info.tags" :key="i">
                         {{ tag }}
                     </router-link>
                 </div>
